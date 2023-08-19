@@ -6,7 +6,10 @@
  * 
  * Considerazioni:
  * L'implementazione richiede la valorizzazione di cammini minimi dato un nodo sorgente, tramite il paradigma della programmazione dinamica.
- * Per cui rispetto alla richiesta occorre implementare l'algoritmo di Floyd-Warshall. 
+ * Per cui rispetto alla richiesta occorre implementare l'algoritmo di Floyd-Warshall.
+ * 
+ * Nota: 
+ * Il file dato a riga di comando ha la medesima impostazione fornita da traccia di esame.
  * 
  * OCCORRE PRIMA STUDIARE LA SEZIONE SUI GRAFI!
  */

@@ -19,6 +19,9 @@
  * 
  * Stabilito l'ordine dell'algoritmo implementato, le funzioni che permettono la stampa tabellare dei differenti cammini minimi dovrebbero essere
  * influenti rispetto al costo computazionale descritto precedentemente.
+ * 
+ * Nota: 
+ * Il file dato a riga di comando ha la medesima impostazione fornita da traccia di esame.
  */
 
 import java.io.*;

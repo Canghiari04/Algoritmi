@@ -19,6 +19,9 @@
  * qualora fosse stata implementata un arraylist. Contrariamente l'operazione di ricerca richiede che l'intera struttura dati sia osservata, 
  * pertanto in relazione al numero di coppie presenti, si ottiene un costo computazionale pari a O(n); si noti come tale complessita' 
  * e' relativa anche al metodo getFileSize() da cui ne deriva l'intera scannerizzazione del sfile di testo per ottenere il numero totale di coppie presenti.
+ * 
+ * Nota: 
+ * Il file dato a riga di comando ha la medesima impostazione fornita da traccia di esame.
  */
 
 import java.io.*;
@@ -174,6 +177,7 @@ class SocietyIcarus {
                  * ossia coppie che abbiano stessa chiave.
                  */
                 coupleArray[i] = c;
+                i++;
             }
             scanFile.close();
         } catch (FileNotFoundException e) {

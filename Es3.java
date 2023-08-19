@@ -13,6 +13,9 @@
  * ottenere un giovamento oppure un peggioramento:
  * - se tutti i valori dell'array risultano (> della soglia k), l'algoritmo richiede O(1) iterazioni, in quanto terminera' immediatamente il ciclo while;
  * - mentre, se tutti i valori dell'array risultano (< della soglia k), allora saranno richiesti O(n) passi.
+ * 
+ * Nota: 
+ * Il file dato a riga di comando ha la medesima impostazione fornita da traccia di esame.
  */
 
 import java.io.*;
