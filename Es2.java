@@ -167,7 +167,6 @@ class SocietyIcarus {
                 String[] tokens = line.split(" ");
 
                 key = Integer.parseInt(tokens[0]);
-                System.out.println(key);
                 value = tokens[1];
 
                 Couple c = new Couple(key, value);
@@ -219,7 +218,6 @@ class SocietyIcarus {
         for (Couple c : coupleArray) {
             if (c.key >= a && c.key <= b) {
                 int size = c.value.length();
-
                 if (size < s) {
                     System.out.println("(" + c.key + ", " + c.value + ")");
                 }
