@@ -174,6 +174,7 @@ class SocietyIcarus {
                  * ossia coppie che abbiano stessa chiave.
                  */
                 coupleArray[i] = c;
+                i++;
             }
             scanFile.close();
         } catch (FileNotFoundException e) {
