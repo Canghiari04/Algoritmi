@@ -1,0 +1,10 @@
+170 albergo
+130 campionato
+90 fiume
+20 patate
+8 frutta
+222 eletto
+51 sentieri
+130 monti
+208 valalla
+180 promontorio

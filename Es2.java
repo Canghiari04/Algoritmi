@@ -164,6 +164,7 @@ class SocietyIcarus {
                 String[] tokens = line.split(" ");
 
                 key = Integer.parseInt(tokens[0]);
+                System.out.println(key);
                 value = tokens[1];
 
                 Couple c = new Couple(key, value);
