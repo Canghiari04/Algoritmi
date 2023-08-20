@@ -27,25 +27,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Es1 {
-    /*
-     * Parametri utilizzati per generare casualmente le coppie [chiave, valore],
-     * rispetto ai seed impostati agli oggetti Random().
-     */
-    static final int maxKey = 1000000000;
-    static final int maxNumberPage = 700;
-    static final int min = 1;
-    static final Random rnd_1 = new Random(1032059);
-    static final Random rnd_2 = new Random(7105914);
-
-    static int randomKey;
-    static int randomNumberPage;
-    static double sum;
     static HashTable table;
 
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
 
-        if (args.length == 0 || Integer.parseInt(args[0]) == 1) {
+        if (args.length == 0 || Integer.parseInt(args[0]) <= 1) {
             System.out.println("Attenzione inserimento errato o mancante del parametro T!");
             System.exit(0);
         } else {
@@ -66,7 +53,7 @@ class HashTable {
     final int maxKey = 1000000000;
     final int maxNumberPage = 700;
     final Random rnd_1 = new Random(1032059);
-    final Random rnd_2 = new Random(7105914);
+    final Random rnd_2 = new Random(7105419);
 
     int randomKey;
     int randomNumberPage;
@@ -97,8 +84,8 @@ class HashTable {
 
     public HashTable(int T) {
         /*
-         * Valorizzazione della formula inversa per il calcolo della dimensione del
-         * vettore, ossia
+         * Valorizzazione della formula inversa per il calcolo della dimensione della
+         * struttura dati, ossia
          * a = T - 1
          * m = n / a
          * combinando le due => m = (n / (T - 1)).
@@ -122,7 +109,7 @@ class HashTable {
 
     /*
      * Metodo per la ricerca di chiavi duplicate, rispetto alle 300 generate
-     * casualemente e calcolo del numero medio di accessi in relazione alla tabella
+     * casualmente e calcolo del numero medio di accessi in relazione alla tabella
      * hash popolata mediante funzione populate().
      */
     public void searchDuplicate(String str) throws IOException {
@@ -130,14 +117,30 @@ class HashTable {
         count = 0;
 
         for (int i = 0; i < 300; i++) {
-            randomKey = rnd_2.nextInt((maxKey - min) + 1) + min;
+            randomKey = rnd_2.nextInt((maxKey) + 1);
 
             int j = verify(randomKey);
+
+            /*
+             * Condizione che verifica la presenza della chiave casuale.
+             * Qualora non sia presente (j == -1) allora il numero di accessi e' equivalente
+             * alla grandezza della specifica lista di trabocco in questione.
+             * Oppure e' presente, per cui e' necessario incrementare il numero di accessi
+             * affinche' non si trovi la corrispondenza tra le due chiavi.
+             */
             if (j == -1) {
+
+                /*
+                 * Variabile count incrementata di 1 poiche' avviene pur sempre un accesso alla
+                 * cella dell'ArrayList esterno tramite la funzione hash, indipendentemente
+                 * dalla lista di trabocco di riferimento.
+                 */
                 count = arrayNode.get(hash(randomKey)).size() + 1;
-                file.println(randomKey + ", \t" + count);
+                file.println(randomKey + ", " + count);
+                sum += count;
             } else {
-                ArrayList<Node> array = arrayNode.get(j);
+                ArrayList<Node> array = arrayNode.get(hash(randomKey));
+                count = 1;
 
                 for (Node n : array) {
                     if (n.getKey() == randomKey) {
@@ -149,15 +152,8 @@ class HashTable {
                     count++;
                 }
 
-                count += 1;
+                sum += count;
             }
-
-            /*
-             * Variabile count incrementata di 1 poiche' avviene pur sempre un accesso alla
-             * cella dell'ArrayList esterno tramite la funzione hash, indipendentemente
-             * dalla lista di trabocco di riferimento.
-             */
-            sum += count + 1;
         }
 
         System.out.println("Il numero medio di accessi risulta (NMA): " + (sum / 300));
@@ -165,7 +161,7 @@ class HashTable {
     }
 
     private void populate() {
-        for (int i = 0; i < (n - 1); i++) {
+        for (int i = 0; i < n; i++) {
             randomKey = rnd_1.nextInt((maxKey - min) + 1) + min;
             randomNumberPage = rnd_1.nextInt((maxNumberPage - min) + 1) + min;
 
@@ -173,13 +169,13 @@ class HashTable {
         }
     }
 
-    public void insert(int key, int value) {
+    private void insert(int key, int value) {
         int i = hash(key);
         int j = verify(key);
 
         /*
-         * Verifica della presenza della chiave nelle liste di trabocco rispetto al
-         * reindirizzamente della funzione hash precedente.
+         * Verifica la presenza della chiave nelle liste di trabocco rispetto al
+         * reindirizzamento della funzione hash precedente.
          * 
          * Se l'indice e' negativo indica che la chiave da inserire ancora non e' stata
          * riscontrata nelle liste di trabocco.
@@ -193,12 +189,12 @@ class HashTable {
         }
     }
 
-    public int verify(int key) {
+    private int verify(int key) {
         int i = hash(key);
         ArrayList<Node> array = arrayNode.get(i);
 
         /*
-         * Controllo della presenza della possbile chiave duplicata, causando possibile
+         * Controllo della presenza della possbile chiave duplicata, causando probabile
          * collisione. Cio' avviene tramite il precedente reindirizzamento della
          * funzione hash, pur sempre calcolato in funzione della chiave.
          */
@@ -218,11 +214,11 @@ class HashTable {
      * 
      * Adottata una funzione hash relativa al metodo della divisione, con un
      * approccio differente. Questo e' dovuto per ovviare alla possibilita' di una
-     * mancata egemone distribuzione delle chiavi, qualora m sia potenza di 2, ossia
-     * m = 2^p; anche se l'oggetto Random() puo' gia' garantire una buona
+     * mancata ed egemone distribuzione delle chiavi, qualora m sia potenza di 2,
+     * ossia, m = 2^p; anche se l'oggetto Random() puo' gia' garantire una buona
      * distribuzione.
      */
-    public int hash(int key) {
+    private int hash(int key) {
         return (key - 1) / intervalSize;
     }
 
