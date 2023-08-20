@@ -7,7 +7,7 @@
 * Considerazioni:
 * L'implementazione prevede l'uso di una tabella hash, mediante l'utilizzo di liste di trabocco. 
 * La scelta ricade soprattutto per la natura dell'oggetto Random(); infatti, in relazione al range 
-* dato come da specifica progettuale, permette di generare valori casuali distribuiti equamente.
+* dato come da specifica progettuale, permette di generare valori casuali distribuiti uniformemente.
 * Per cui in relazione ad una corretta funzione hash di base, e' possibile garantire una buona distribuzione
 * delle coppie chiave-valore.
 * 
@@ -15,7 +15,7 @@
 * il puntatore di ogni lista di trabocco, implementate mediante ArrayList. Innanzitutto occorre ricavare 
 * il valore del fattore di carico, rispetto al parametro T (ossia il numero medio di accessi) dato come parametro 
 * del costruttore della classe HashTable, attraverso la formula generale T = a + 1 => a = T - 1. 
-* Ottenuto il fattore di carico, tramite a = n / m => m = n / a, si ottiene la dimensione della struttura dati rappresentante
+* Ottenuto il fattore di carico (a), tramite a = n / m => m = n / a, si ottiene la dimensione della struttura dati rappresentante
 * la tabella hash. Infine in ogni cella verra' inizializzato un ArrayList contenente le differenti coppie, reindirizzate in posizioni
 * congrue rispetto all'intervalSize posto tra range di valori casuali e grandezza del vettore
 */
@@ -212,6 +212,12 @@ class HashTable {
     /*
      * Funzione hash che individua la cella dell'ArrayList posto esternamente,
      * affinche' sia possibile risalire alle strutture dati interne.
+     * 
+     * Adottata una funzione hash relativa al metodo della divisione, con un
+     * approccio differente. Questo e' dovuto per ovviare alla possibilita' di una
+     * mancata egemone distribuzione delle chiavi, qualora m sia potenza di 2, ossia
+     * m = 2^p; anche se l'oggetto Random() puo' gia' garantire una buona
+     * distribuzione.
      */
     public int hash(int key) {
         return (key - 1) / intervalSize;
