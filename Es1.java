@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.ArrayList;
 import java.io.IOException;
-import java.io.FileWriter;
+import java.io.PrintWriter;
 
 public class Es1 {
     /*
@@ -45,11 +45,11 @@ public class Es1 {
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
 
-        if (args.length != 0) {
-            table = new HashTable(Integer.parseInt(args[0]));
-        } else {
-            System.out.println("Attenzione occorre inserire il valore del parametro T!");
+        if (args.length == 0 || Integer.parseInt(args[0]) == 1) {
+            System.out.println("Attenzione inserimento errato o mancante del parametro T!");
             System.exit(0);
+        } else {
+            table = new HashTable(Integer.parseInt(args[0]));
         }
 
         try {
@@ -93,7 +93,7 @@ class HashTable {
     private int count;
     private int sum;
 
-    ArrayList<ArrayList<Node>> arrayNode;
+    private ArrayList<ArrayList<Node>> arrayNode;
 
     public HashTable(int T) {
         /*
@@ -120,22 +120,13 @@ class HashTable {
         populate();
     }
 
-    public void populate() {
-        for (int i = 0; i < 9999; i++) {
-            randomKey = rnd_1.nextInt((maxKey - min) + 1) + min;
-            randomNumberPage = rnd_1.nextInt((maxNumberPage - min) + 1) + min;
-
-            insert(randomKey, randomNumberPage);
-        }
-    }
-
+    /*
+     * Metodo per la ricerca di chiavi duplicate, rispetto alle 300 generate
+     * casualemente e calcolo del numero medio di accessi in relazione alla tabella
+     * hash popolata mediante funzione populate().
+     */
     public void searchDuplicate(String str) throws IOException {
-        FileWriter file = new FileWriter(str);
-        /*
-         * Variabile count inizializzata ad 1 poiche' avviene pur sempre un accesso alla
-         * cella dell'ArrayList esterno tramite la funzione hash, indipendentemente
-         * dalla lista di trabocco di riferimento.
-         */
+        PrintWriter file = new PrintWriter(str);
         count = 0;
 
         for (int i = 0; i < 300; i++) {
@@ -144,7 +135,7 @@ class HashTable {
             int j = verify(randomKey);
             if (j == -1) {
                 count = arrayNode.get(hash(randomKey)).size() + 1;
-                file.write(randomKey + ", \t" + count + "\n");
+                file.println(randomKey + ", \t" + count);
             } else {
                 ArrayList<Node> array = arrayNode.get(j);
 
@@ -161,13 +152,25 @@ class HashTable {
                 count += 1;
             }
 
+            /*
+             * Variabile count incrementata di 1 poiche' avviene pur sempre un accesso alla
+             * cella dell'ArrayList esterno tramite la funzione hash, indipendentemente
+             * dalla lista di trabocco di riferimento.
+             */
             sum += count + 1;
         }
 
-        // Da notare come con l'aggiunta dell'accesso alla struttura dati esterna, la
-        // tabella hash, rispetta perfettamente il NMA dato da consegna.
-        System.out.println(sum / 300);
+        System.out.println("Il numero medio di accessi risulta (NMA): " + (sum / 300));
         file.close();
+    }
+
+    private void populate() {
+        for (int i = 0; i < (n - 1); i++) {
+            randomKey = rnd_1.nextInt((maxKey - min) + 1) + min;
+            randomNumberPage = rnd_1.nextInt((maxNumberPage - min) + 1) + min;
+
+            insert(randomKey, randomNumberPage);
+        }
     }
 
     public void insert(int key, int value) {
@@ -195,9 +198,9 @@ class HashTable {
         ArrayList<Node> array = arrayNode.get(i);
 
         /*
-         * Controllo della presenza della chiave o meno, causando possibile collisione.
-         * Cio' avviene tramite il precedente reindirizzamento della funzione hash, pur
-         * sempre calcolato in funzione della chiave.
+         * Controllo della presenza della possbile chiave duplicata, causando possibile
+         * collisione. Cio' avviene tramite il precedente reindirizzamento della
+         * funzione hash, pur sempre calcolato in funzione della chiave.
          */
         for (int j = 0; j < array.size(); j++) {
             if (array.get(j).getKey() == key) {
