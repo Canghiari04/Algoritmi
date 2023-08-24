@@ -5,19 +5,19 @@
 * Matricola: 1032059
 * 
 * Considerazioni:
-* L'implementazione prevede l'uso di una tabella hash, mediante l'utilizzo di liste di trabocco. 
-* La scelta ricade soprattutto per la natura dell'oggetto Random(); infatti, in relazione al range 
-* dato come da specifica progettuale, permette di generare valori casuali distribuiti uniformemente.
-* Per cui in relazione ad una corretta funzione hash di base, e' possibile garantire una buona distribuzione
-* delle coppie chiave-valore.
-* 
-* Passo fondamentale e' relativo al calcolo della dimensione della struttura esterna, ossia del vettore contenente 
-* il puntatore di ogni lista di trabocco, implementate mediante ArrayList. Innanzitutto occorre ricavare 
-* il valore del fattore di carico, rispetto al parametro T (ossia il numero medio di accessi) dato come parametro 
-* del costruttore della classe HashTable, attraverso la formula generale T = a + 1 => a = T - 1. 
-* Ottenuto il fattore di carico (a), tramite a = n / m => m = n / a, si ottiene la dimensione della struttura dati rappresentante
-* la tabella hash. Infine in ogni cella verra' inizializzato un ArrayList contenente le differenti coppie, reindirizzate in posizioni
-* congrue rispetto all'intervalSize posto tra range di valori casuali e grandezza del vettore
+* L'implementazione adotta una tabella hash, sviluppando liste di trabocco; ogni cella contiene al suo 
+* interno un riferimento alla testa della lista. La grandezza di ogni lista di trabocco e' data dal fattore di carico,
+* ossia il rapporto che pone a numeratore il numero di chiavi effettivamente memorizzate e a denominatore la dimensione
+* del vettore rappresentante la struttura dati esterna, a = (n / m). Il calcolo del fattore di carico e' relativo
+* ad un certo passaggio, in cui rispetto all'istanza dell'oggetto HashTable, e' passato come parametro il numero medio di accessi.
+* Il numero medio di accessi, o brevemente NMA, garantisce la possibilita' di risalire al fattore di carico, attraverso la formula
+* inversa cosi conosciuta: NMA = 1 + a => a = NMA - 1. 
+*
+* Compiuto tale passo, e' riconducibile la grandezza del vettore esterno e la dimensione di ogni lista di trabocco. La funzione 
+* hash e' basata sul metodo della divisione, dove calcolata la dimensione dei sotto-intervalli che costituiscono il range di valori
+* casuali delle key, e' garantita un'indicizzazione che prenda in esame la chiave e la dimensione degli intervalli stessi.
+* Si nota, come la generazione di chiavi mediante valori casuali, dovrebbe gia' garantire una buona equi-distanza tra le coppie, 
+* proprio per natura dell'oggetto Random(), attribuendo un'accettabile distribuzione nelle celle del vettore.
 */
 
 import java.util.Locale;
@@ -49,6 +49,9 @@ public class Es1 {
 }
 
 class HashTable {
+    /*
+     * Variabili utilizzate per la generazione di valori interi casuali.
+     */
     final int min = 1;
     final int maxKey = 1000000000;
     final int maxNumberPage = 700;
@@ -84,8 +87,8 @@ class HashTable {
 
     public HashTable(int T) {
         /*
-         * Valorizzazione della formula inversa per il calcolo della dimensione della
-         * struttura dati, ossia
+         * Valorizzazione della formula inversa per il calcolo della dimensione dell'
+         * ArrayList esterno, ossia
          * a = T - 1
          * m = n / a
          * combinando le due => m = (n / (T - 1)).
@@ -109,8 +112,8 @@ class HashTable {
 
     /*
      * Metodo per la ricerca di chiavi duplicate, rispetto alle 300 generate
-     * casualmente e calcolo del numero medio di accessi in relazione alla tabella
-     * hash popolata mediante funzione populate().
+     * casualmente e calcolo del numero medio di accessi sperimentale in relazione
+     * alla tabella hash popolata mediante funzione populate().
      */
     public void searchDuplicate(String str) throws IOException {
         PrintWriter file = new PrintWriter(str);
@@ -122,11 +125,11 @@ class HashTable {
             int j = verify(randomKey);
 
             /*
-             * Condizione che verifica la presenza della chiave casuale.
-             * Qualora non sia presente (j == -1) allora il numero di accessi e' equivalente
-             * alla grandezza della specifica lista di trabocco in questione.
-             * Oppure e' presente, per cui e' necessario incrementare il numero di accessi
-             * affinche' non si trovi la corrispondenza tra le due chiavi.
+             * Condizione che verifica la presenza della chiave generata.
+             * Qualora non sia presente (j == -1) allora il numero di accessi e' pari al
+             * caso di insuccesso, ossia NMA = 1 + a. Oppure se presente, e' necessario
+             * incrementare il numero di accessi affinche' non si trovi la corrispondenza
+             * tra le due chiavi, ottenendo il dato sperimentale.
              */
             if (j == -1) {
 
@@ -179,7 +182,8 @@ class HashTable {
          * 
          * Se l'indice e' negativo indica che la chiave da inserire ancora non e' stata
          * riscontrata nelle liste di trabocco.
-         * Mentre in caso contrario, avviene la sovrascrittura del value della coppia.
+         * Mentre in caso contrario, avviene la sovrascrittura del value della coppia
+         * che abbia la stessa chiave.
          */
         if (j == -1) {
             arrayNode.get(i).add(new Node(key, value));
@@ -190,14 +194,14 @@ class HashTable {
     }
 
     private int verify(int key) {
+        /*
+         * Controllo della presenza della chiave passata come parametro. Cio' avviene
+         * tramite il primo accesso alla cella di riferimento attraverso la funzione
+         * hash, risalendo al puntatore della lista di trabocco, per poi ciclare sulla
+         * stessa per garantire veridicita' o meno.
+         */
         int i = hash(key);
         ArrayList<Node> array = arrayNode.get(i);
-
-        /*
-         * Controllo della presenza della possbile chiave duplicata, causando probabile
-         * collisione. Cio' avviene tramite il precedente reindirizzamento della
-         * funzione hash, pur sempre calcolato in funzione della chiave.
-         */
         for (int j = 0; j < array.size(); j++) {
             if (array.get(j).getKey() == key) {
                 System.out.println(array.get(j));
@@ -211,12 +215,6 @@ class HashTable {
     /*
      * Funzione hash che individua la cella dell'ArrayList posto esternamente,
      * affinche' sia possibile risalire alle strutture dati interne.
-     * 
-     * Adottata una funzione hash relativa al metodo della divisione, con un
-     * approccio differente. Questo e' dovuto per ovviare alla possibilita' di una
-     * mancata ed egemone distribuzione delle chiavi, qualora m sia potenza di 2,
-     * ossia, m = 2^p; anche se l'oggetto Random() puo' gia' garantire una buona
-     * distribuzione.
      */
     private int hash(int key) {
         return (key - 1) / intervalSize;
