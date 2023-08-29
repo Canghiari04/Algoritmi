@@ -5,17 +5,11 @@
 * Matricola: 1032059
 * 
 * Considerazioni:
-* L'implementazione adotta una tabella hash, sviluppando liste di trabocco; ogni cella contiene al suo 
-* interno un riferimento alla testa della lista. La grandezza di ogni lista di trabocco e' data dal fattore di carico,
-* ossia il rapporto che pone a numeratore il numero di chiavi effettivamente memorizzate e a denominatore la dimensione
-* del vettore rappresentante la struttura dati esterna, a = (n / m). Il calcolo del fattore di carico e' relativo
-* ad un certo passaggio, in cui rispetto all'istanza dell'oggetto HashTable, e' passato come parametro il numero medio di accessi.
-* Il numero medio di accessi, o brevemente NMA, garantisce la possibilita' di risalire al fattore di carico, attraverso la formula
-* inversa cosi conosciuta: NMA = 1 + a => a = NMA - 1. 
-*
-* Compiuto tale passo, e' riconducibile la grandezza del vettore esterno e la dimensione di ogni lista di trabocco. La funzione 
-* hash e' basata sul metodo della divisione, dove calcolata la dimensione dei sotto-intervalli che costituiscono il range di valori
-* casuali delle key, e' garantita un'indicizzazione che prenda in esame la chiave e la dimensione degli intervalli stessi.
+* L'implementazione adotta una tabella hash, limitando il numero di collisioni tramite l'uso delle liste di trabocco il cui riferimento è
+* memorizzato nell'array posto esternamente. Fornito il numero di accessi (T), mediante formule inverse, è stato calcolato nel 
+* costruttore della classe HashTable il fattore di carico (a); passo fondamentale per stabilire la dimensione dell'array esterno. 
+* La funzione hash utilizzata è basata sul metodo della divisione, poiché l'indicizzazione delle coppie key-value avviene tramite la 
+* valorizzazione di sotto-intervalli, che riescano a coprire l'intero range di generazione casuale delle chiavi.
 * Si nota, come la generazione di chiavi mediante valori casuali, dovrebbe gia' garantire una buona equi-distanza tra le coppie, 
 * proprio per natura dell'oggetto Random(), attribuendo un'accettabile distribuzione nelle celle del vettore.
 */
@@ -86,6 +80,7 @@ class HashTable {
     private ArrayList<ArrayList<Node>> arrayNode;
 
     public HashTable(int T) {
+        
         /*
          * Valorizzazione della formula inversa per il calcolo della dimensione dell'
          * ArrayList esterno, ossia
@@ -127,7 +122,7 @@ class HashTable {
             /*
              * Condizione che verifica la presenza della chiave generata.
              * Qualora non sia presente (j == -1) allora il numero di accessi e' pari al
-             * caso di insuccesso, ossia NMA = 1 + a. Oppure se presente, e' necessario
+             * caso di insuccesso, ossia T = 1 + a. Oppure se presente, e' necessario
              * incrementare il numero di accessi affinche' non si trovi la corrispondenza
              * tra le due chiavi, ottenendo il dato sperimentale.
              */
