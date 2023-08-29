@@ -141,15 +141,6 @@ class Promotion {
             if (I[m] <= k) {
                 return countPromotions(I, k, m + 1, j);
             } else {
-                /*
-                 * L'incremento e' dovuto all'uso degli indici rispetto a strutture dati
-                 * statiche,
-                 * quale array.
-                 * 
-                 * In relazione al metodo countPromotions() e' posta come parametro la
-                 * differenza (m - 1), passo voluto per valorizzare la prima condizione
-                 * della funzione (i > j) e pertanto concludere l'esecuzione.
-                 */
                 return ((j - m) + 1) + countPromotions(I, k, i, m - 1);
             }
         }
