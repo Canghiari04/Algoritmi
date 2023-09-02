@@ -26,20 +26,19 @@ import java.util.Locale;
 import java.util.Scanner;
 import java.io.File;
 
-public class Es2 {
+public class Esercizio2 {
 
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
+        Scanner scan = new Scanner(System.in);
         if (args.length != 1) {
             System.err.println("Usage -> java Esercizio2 Esercizio2.txt");
             System.exit(0);
         }
 
-        Scanner scan = new Scanner(System.in);
-
         /*
          * Variabili che mantengono i valori delle soglie a cui si riferiscono le due
-         * stampe richieste.
+         * stampe.
          */
         int a, b, y, s;
 
@@ -51,7 +50,7 @@ public class Es2 {
 
         /*
          * Oggetto SocietyIcarus a cui è passato come parametro il nome del file da cui
-         * avviene il riempimento della struttura dati in questione.
+         * avviene il riempimento del vettore.
          */
         SocietyIcarus example = new SocietyIcarus(args[0]);
 
@@ -75,7 +74,7 @@ public class Es2 {
                 System.out.println("-------------------------------------------------");
 
                 /*
-                 * Ricerca e stampa di tutte le coppie di valori (key:x, value:str) che
+                 * Ricerca e stampa di tutte le coppie di valori (key --> x, value --> str) che
                  * rispettino: a ≤ x ≤ b e str ≤ s.
                  */
                 example.firstStamp(a, b, s);
@@ -101,7 +100,7 @@ public class Es2 {
                 System.out.println("-------------------------------------------------");
 
                 /*
-                 * Ricerca e stampa di tutte le coppie di valori (key:x, value:str) che
+                 * Ricerca e stampa di tutte le coppie di valori (key --> x, value --> str) che
                  * rispettino: x ≥ c
                  */
                 example.secondStamp(y);
@@ -167,7 +166,7 @@ class SocietyIcarus {
 
                 /*
                  * Condizione necessaria per gestire e monitorare la possibilita' di duplicati,
-                 * ossia coppie che abbiano stessa chiave.
+                 * ossia coppie che abbiano stessa chiave e valore.
                  */
                 coupleArray[i] = c;
                 i++;

@@ -17,27 +17,25 @@
 import java.util.Locale;
 import java.util.Random;
 import java.util.ArrayList;
-import java.io.IOException;
 import java.io.PrintWriter;
 
-public class Es1 {
+public class Esercizio1 {
     static HashTable table;
 
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
 
         if (args.length == 0 || Integer.parseInt(args[0]) <= 1) {
-            System.out.println("Usage: java Es1 T (T ==> numero medio di accessi, con T > 1)");
+            System.out.println("Usage: java Es1 T (T --> numero medio di accessi, con T > 1)");
             System.exit(0);
         } else {
             table = new HashTable(Integer.parseInt(args[0]));
         }
 
         try {
-            table.searchDuplicate("Es1.txt");
-        } catch (IOException e) {
-            System.out.println("Attenzione lettura errata del file di output!");
-            e.getMessage();
+            table.searchDuplicate("Esercizio1.txt");
+        } catch (Exception e) {
+            System.out.println("Attenzione scrittura errata del file di output!");
         }
     }
 }
@@ -82,6 +80,11 @@ class HashTable {
     public HashTable(int T) {
 
         /*
+         * Variabili utilizzate come di seguito:
+         * a --> fattore di carico.
+         * n --> chiavi effettivamente memorizzate.
+         * m --> dimensione dell'array esterno.
+         * 
          * Valorizzazione della formula inversa per il calcolo della dimensione dell'
          * ArrayList esterno, ossia
          * a = T - 1
@@ -110,52 +113,56 @@ class HashTable {
      * casualmente e calcolo del numero medio di accessi sperimentale in relazione
      * alla tabella hash popolata mediante funzione populate().
      */
-    public void searchDuplicate(String str) throws IOException {
-        PrintWriter file = new PrintWriter(str);
-        count = 0;
+    public void searchDuplicate(String str) {
+        try {
+            PrintWriter file = new PrintWriter(str);
+            count = 0;
 
-        for (int i = 0; i < 300; i++) {
-            randomKey = rnd_2.nextInt((maxKey) + 1);
+            for (int i = 0; i < 300; i++) {
+                randomKey = rnd_2.nextInt((maxKey) + 1);
 
-            int j = verify(randomKey);
-
-            /*
-             * Condizione che verifica la presenza della chiave generata.
-             * Qualora non sia presente (j == -1) allora il numero di accessi e' pari al
-             * caso di insuccesso, ossia T = 1 + a. Oppure se presente, e' necessario
-             * incrementare il numero di accessi affinche' non si trovi la corrispondenza
-             * tra le due chiavi, ottenendo il dato sperimentale.
-             */
-            if (j == -1) {
+                int j = verify(randomKey);
 
                 /*
-                 * Variabile count incrementata di 1 poiche' avviene pur sempre un accesso alla
-                 * cella dell'ArrayList esterno tramite la funzione hash, indipendentemente
-                 * dalla lista di trabocco di riferimento.
+                 * Condizione che verifica la presenza della chiave generata.
+                 * Qualora non sia presente (j == -1) allora il numero di accessi e' pari al
+                 * caso di insuccesso, ossia T = 1 + a. Oppure se presente, e' necessario
+                 * incrementare il numero di accessi affinche' non si trovi la corrispondenza
+                 * tra le due chiavi, ottenendo il dato sperimentale.
                  */
-                count = arrayNode.get(hash(randomKey)).size() + 1;
-                file.println(randomKey + ", " + count);
-                sum += count;
-            } else {
-                ArrayList<Node> array = arrayNode.get(hash(randomKey));
-                count = 1;
+                if (j == -1) {
 
-                for (Node n : array) {
-                    if (n.getKey() == randomKey) {
+                    /*
+                     * Variabile count incrementata di 1 poiche' avviene pur sempre un accesso alla
+                     * cella dell'ArrayList esterno tramite la funzione hash, indipendentemente
+                     * dalla lista di trabocco di riferimento.
+                     */
+                    count = arrayNode.get(hash(randomKey)).size() + 1;
+                    file.println(randomKey + ", " + count);
+                    sum += count;
+                } else {
+                    ArrayList<Node> array = arrayNode.get(hash(randomKey));
+                    count = 1;
+
+                    for (Node n : array) {
+                        if (n.getKey() == randomKey) {
+                            count++;
+                            System.out.println(n);
+                            break;
+                        }
+
                         count++;
-                        System.out.println(n);
-                        break;
                     }
 
-                    count++;
+                    sum += count;
                 }
-
-                sum += count;
             }
-        }
 
-        System.out.println("Il numero medio di accessi risulta (NMA): " + (sum / 300));
-        file.close();
+            System.out.println("Il numero medio di accessi risulta (NMA): " + (sum / 300));
+            file.close();
+        } catch (Exception e) {
+            System.out.println("Attenzione scrittura errata del file di output!");
+        }
     }
 
     private void populate() {
@@ -177,7 +184,7 @@ class HashTable {
          * 
          * Se l'indice e' negativo indica che la chiave non è presente all'interno delle
          * liste di trabocco.
-         * Mentre in caso contrario, avviene la sovrascrittura del value della coppia
+         * Mentre in caso contrario, avviene la modifica del dato satellite della coppia
          * che abbia la stessa chiave.
          */
         if (j == -1) {

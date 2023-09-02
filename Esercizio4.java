@@ -25,29 +25,24 @@
  * influenti rispetto al costo computazionale descritto precedentemente.
  * 
  * Nota: 
- * Il file dato a riga di comando ha la medesima impostazione fornita da traccia di esame.
+ * Il file dato a riga di comando ha la medesima impostazione fornita dalla traccia dell'esame.
  */
 
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Scanner;
+import java.util.Arrays;
+import java.io.File;
 
-public class Es4 {
+public class Esercizio4 {
     public static void main(String[] args) {
-        Locale.setDefault(Locale.US);
-
         if (args.length != 1) {
-            System.out.println("Specificare il nome del file!");
+            System.out.println("Usage: java Esercizio4 Esercizio4.txt");
         }
 
         AbileneGraph example = new AbileneGraph(args[0]);
 
-        /*
-         * Metodo utilizzato per ottenere la totalita' dei nodi appartenenti al grafo,
-         * da cui avviene la stampa di tutti i cammini minimi rispetto ai singoli nodi.
-         */
-        int idNumberNode = example.getNumberNode();
-
-        for (int i = 0; i < idNumberNode; i++) {
+        for (int i = 0; i < example.n; i++) {
             if (!example.shortestPaths(i))
                 example.print_paths();
             else
@@ -68,16 +63,15 @@ class AbileneGraph {
      * sorgente.
      */
     int source;
-    int[] p;
-    double[] d;
-    Edge[] sp;
+    int[] T;
+    double[] D;
 
     /*
      * Varibiale intera maxCapacity attuata affinche' possa essere stabilito il peso
      * di ogni edge.
      */
     private double maxCapacity = 0;
-    private Map<String, Integer> nodes = new HashMap<String, Integer>();
+    private HashMap<String, Integer> nodes = new HashMap<String, Integer>();
     private LinkedList<Edge> edges = new LinkedList<Edge>();
 
     public AbileneGraph(String nameFile) {
@@ -85,13 +79,6 @@ class AbileneGraph {
         scanFile(file);
     }
 
-    public int getNumberNode() {
-        return this.n;
-    }
-
-    /*
-     * Lettura del grafo da parte dell'input file.
-     */
     public void scanFile(File file) {
         try {
             Scanner scanFile = new Scanner(file);
@@ -100,8 +87,7 @@ class AbileneGraph {
 
                 /*
                  * I nodi sono ammessi all'interno di una mappa, affinche' possano essere poi
-                 * utilizzati per la costruzione degli edge, rispetto ai valori interi
-                 * associati.
+                 * utilizzati i valori interi associati per la costruzione degli edge.
                  */
                 if (line.equals("NODES (")) {
                     line = scanFile.nextLine();
@@ -155,59 +141,80 @@ class AbileneGraph {
             for (Edge e : edges) {
                 e.setWeight(maxCapacity);
             }
-        } catch (FileNotFoundException e) {
-            e.getMessage();
+        } catch (Exception e) {
+            System.out.println("Attenzione lettura errata del file di input!");
         }
     }
 
     /*
-     * Costruzione del cammino minimo di ogni nodo appartenete al grafo, rispetto al
+     * Costruzione del cammino minimo di ogni nodo appartenente al grafo, rispetto
+     * al
      * paradigma di Bellman-Ford.
-     * Nel caso dovessero essere individuati pesi negativi restituisce false, dove
-     * rispetto alla condizione posta all'interno del costrutto, non permette la
-     * stampa di nessun cammino minimo.
+     * Nel caso dovessero essere individuati cicli di peso negativo restituisce
+     * false, non permettendo la stampa di nessun cammino minimo.
      */
     public boolean shortestPaths(int s) {
         source = s;
-        d = new double[n];
-        p = new int[n];
-        sp = new Edge[n];
 
         /*
-         * Inizializzazione delle strutture dati usate.
+         * Variabili usate come di seguito:
+         * D --> vettore delle distanze;
+         * T --> vettore dei padri.
          */
-        Arrays.fill(d, Double.POSITIVE_INFINITY);
-        Arrays.fill(p, -1);
+        D = new double[n];
+        T = new int[n];
 
-        d[s] = 0.0;
-        for (int i = 0; i < n - 1; i++) {
+        /*
+         * Sovrastima della distanza per ogni nodo u appartenente all'insieme dei nodi
+         * del grafo, affinchè durante la composizione della soluzione, tale limite
+         * possa descrescere fino a quando non raggiunga il valore minimo associato alla
+         * sequenza di archi e nodi attraversati.
+         */
+        Arrays.fill(D, Double.POSITIVE_INFINITY);
+        Arrays.fill(T, -1);
+
+        /*
+         * Primo passo di rilassamento, il quale consiste nella valorizzazione del
+         * vettore delle distanze rispetto alla sorgente (s) pari a 0.
+         */
+        D[s] = 0.0;
+
+        /*
+         * Eseguiti (n - 1) passi di rilassamento sul totale degli archi contenuti dal
+         * grafo. Solamente al termine di tali passaggi si è sicuri della soluzione
+         * costruita, e da cui deriva il controllo per cicli negativi.
+         */
+        for (int i = 0; i < (n - 1); i++) {
             for (Edge e : edges) {
                 final int src = e.src;
                 final int dst = e.dst;
-                final double w = e.getWeigth();
+                final double w = e.w;
 
                 /*
-                 * Formula generale per calcolo del cammino minimo secondo Bellman-Ford, dati
-                 * peso, partenza e destinazione.
+                 * Adottata la condizione di ottimalita' di Bellman, in cui la soluzione
+                 * ammissibile e' ottima se e solo se:
+                 * - (u, v) appartiene a T (soluzione ammissibile) allora d[v] = d[u] + w(u, v);
+                 * - (u, v) appartiene a E allora d[v] ≤ d[u] = w(u, v).
+                 * Qualora una delle due condizioni non sia rispettata allora il limite
+                 * superiore e' rilassato, ossia modificato rispetto alla nuova soluzione
+                 * ottima.
                  */
-                if (d[src] + w < d[dst]) {
-                    d[dst] = d[src] + w;
-                    p[dst] = src;
-                    sp[dst] = e;
+                if (D[src] + w < D[dst]) {
+                    D[dst] = D[src] + w;
+                    T[dst] = src;
                 }
             }
         }
 
         /*
-         * Ciclo utilizzato per accertarsi la presenza di pesi negativi associati agli
-         * archi.
+         * Ciclo utilizzato per accertarsi della presenza di cicli negativi.
          */
         for (Edge e : edges) {
             final int src = e.src;
             final int dst = e.dst;
-            final double w = e.getWeigth();
+            final double w = e.w;
 
-            if (d[src] + w < d[dst]) {
+            if (D[src] + w < D[dst]) {
                 return true;
             }
         }
@@ -224,23 +231,25 @@ class AbileneGraph {
         System.out.println("   s    d         dist                path");
         System.out.println("---- ---- ------------ -------------------");
         for (int dst = 0; dst < n; dst++) {
-            System.out.printf("%4d %4d %12.4f ", source, dst, d[dst]);
+            System.out.printf("%4d %4d %12.4f ", source, dst, D[dst]);
             print_path(dst);
             System.out.println();
         }
     }
 
     /*
-     * Stampa del cammino minimo che collega un certo nodo source e un nodo
-     * destination.
+     * Stampa del cammino minimo da un certo nodo di destinazione (dst)
+     * raggiungibile dal nodo sorgente (s). Tale algoritmo si basa sulla stampa
+     * dell'albero di copertura adottata durante l'operazione di visita in ampiezza
+     * (BFS), tramite l'impiego del vettore dei padri (T[]).
      */
     protected void print_path(int dst) {
         if (dst == source)
             System.out.print(dst);
-        else if (p[dst] < 0)
-            System.out.print("Irraggiungibile");
+        else if (T[dst] < 0)
+            System.out.print("Attenzione impossibile raggiungere il nodo di destinazione!");
         else {
-            print_path(p[dst]);
+            print_path(T[dst]);
             System.out.print("->" + dst);
         }
     }
@@ -249,17 +258,13 @@ class AbileneGraph {
 class Edge {
     final int src;
     final int dst;
-    private double capacity;
-    private double w;
+    double capacity;
+    double w;
 
     public Edge(int src, int dst, double capacity) {
         this.src = src;
         this.dst = dst;
         this.capacity = capacity;
-    }
-
-    public double getWeigth() {
-        return this.w;
     }
 
     public void setWeight(double maxCapacity) {

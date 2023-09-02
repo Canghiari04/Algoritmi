@@ -5,25 +5,27 @@
  * Matricola: 1032059
  * 
  * Considerazioni; 
- * L'implementazione, oltre alla corretta lettura del file, richiede l'uso della tecnica Divide-et-Impera affinche' sia possibile comparare
- * quali valori dell'array I[i] risultino essere maggiori della soglia k. Il costo computazionale medio dell'algoritmo utilizzato,
- * basato sulla ricerca binaria, risulta essere O(log n), dove comunque non e' detto che sia necessario scorrere l'intera struttura dati.
+ * L'implementazione per calcolare il numero di elementi avviene tramite l'uso dell'algoritmo binarySearch, legato alla tecnica di programmazione
+ * divide-et-impera. Infatti la ricerca di elementi che siano maggiori di una certa soglia, avviene tramite la suddivisione in sotto-problemi indipendenti,
+ * da cui ne deriva il significato del calcolo dell'indice medio. Rispetto al valore del vettore contenuto nell'indice medio avviene la chiamata ricorsiva 
+ * sulla porzione di Array di riferimento, per verificare il numero complessivo di celle che abbiano un valore maggiore della soglia (k).
  * 
- * Si possono stabilire casi, legati alla soglia stabilita e ai valori contenuti nell'array ordinato, in cui il costo computazionale potrebbe
- * ottenere un giovamento oppure un peggioramento:
- * - se tutti i valori dell'array risultano (> della soglia k), l'algoritmo richiede O(1) iterazioni, in quanto terminera' immediatamente il ciclo while;
- * - mentre, se tutti i valori dell'array risultano (< della soglia k), allora saranno richiesti O(n) passi.
- * 
- * 
+ * Il calcolo ricorsivo per indicare quali valori soddisfino la richiesta risulta ((j - m) + 1), dove
+ * - j, rappresenta l'indice dell'ultima cella della struttura dati o sottostruttura;
+ * - m, indice medio calcolato come (j + i) / 2.
+ * Quindi il numero di elementi maggiori della soglia è dato dalla differenza degli indici j e m, e dalla cella posta nell'indice medio, 
+ * poichè, come da condizione della selezione, (A[m] > k), per cui avviene la chiamata risorsiva sul sottovettore posto alla sinistra di m.
+ * Infine il costo computazionale è pari al limite asintotico superiore O(log n), ossia complessità logaritmica rispetto al caso medio.
  * 
  * Nota: 
  * Il file dato a riga di comando ha la medesima impostazione fornita dalla traccia dell'esame.
  */
 
-import java.io.*;
-import java.util.*;
+import java.util.Locale;
+import java.util.Scanner;
+import java.io.File;
 
-public class Es3 {
+public class Esercizio3 {
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
         if (args.length != 1) {
@@ -33,31 +35,19 @@ public class Es3 {
 
         Promotion promotion = new Promotion(args[0]);
         System.out.println("Il numero di dipendenti soggetti alla promozione: " + "\n"
-                + promotion.countPromotions(promotion.getArray(), promotion.getK(), 0, (promotion.getLength() - 1)));
+                + promotion.countPromotions(promotion.I, promotion.k, 0, (promotion.n - 1)));
     }
 }
 
 class Promotion {
-    private int n;
-    private int i = 0;
-    private double k;
-    private double[] I;
+    int n;
+    int i = 0;
+    double k;
+    double[] I;
 
     public Promotion(String nameFile) {
         File file = new File(nameFile);
         scanFile(file);
-    }
-
-    public int getLength() {
-        return n;
-    }
-
-    public double getK() {
-        return k;
-    }
-
-    public double[] getArray() {
-        return I;
     }
 
     public void scanFile(File file) {
@@ -71,7 +61,7 @@ class Promotion {
                     line = scanFile.nextLine();
 
                     /*
-                     * Lettura della dimensione della struttura dati e inizializzazione dell'array
+                     * Lettura della dimensione della struttura dati e inizializzazione dell'array.
                      */
                     n = Integer.parseInt(line);
                     I = new double[n];
@@ -99,22 +89,21 @@ class Promotion {
                 }
             }
             scanFile.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Attenzione lettura errata del file di input!");
         }
     }
 
     /*
      * Metodo countPromotions, utilizzato per poter calcolare il numero di
      * promozioni rispetto alla soglia data. Il metodo ha un medesimo approccio
-     * dell'algoritmo binarySearch, in cui Ã¨ risolto solo uno dei due
-     * sotto-problemi
-     * in maniera ricorsiva.
+     * dell'algoritmo binarySearch, in cui e' risolto solo uno dei due
+     * sotto-problemi indipendenti in maniera ricorsiva.
      * 
-     * Il calcolo relativo all riga (125) conta gli elementi maggiori della soglia,
-     * posti tra l'indice medio (m), calcolato nel vettore oppure nel sottovettore,
+     * Il calcolo relativo all riga (128) conta gli elementi maggiori della soglia,
+     * posti tra l'indice medio (m), calcolato nel vettore oppure nel sotto-vettore,
      * fino al valore contenuto all'estremo della struttura dati, essendo un array
-     * ordinato in modo crescente.
+     * ordinato in maniera crescente.
      */
     public int countPromotions(double[] I, double k, int i, int j) {
         if (i > j) {
