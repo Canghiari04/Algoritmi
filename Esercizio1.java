@@ -24,18 +24,20 @@ public class Esercizio1 {
 
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
-
-        if (args.length == 0 || Integer.parseInt(args[0]) <= 1) {
-            System.out.println("Usage: java Es1 T (T --> numero medio di accessi, con T > 1)");
-            System.exit(0);
-        } else {
-            table = new HashTable(Integer.parseInt(args[0]));
-        }
-
         try {
-            table.searchDuplicate("Esercizio1.txt");
+            if (args.length == 0 || Integer.parseInt(args[0]) <= 1) {
+                System.out.println("Usage: java Es1 T (T --> numero medio di accessi, con T > 1)");
+                System.exit(0);
+            } else {
+                table = new HashTable(Integer.parseInt(args[0]));
+                try {
+                    table.searchDuplicate("Esercizio1.txt");
+                } catch (Exception e) {
+                    System.out.println("Attenzione scrittura errata del file di output!");
+                }
+            }
         } catch (Exception e) {
-            System.out.println("Attenzione scrittura errata del file di output!");
+            System.out.println("Usage: java Es1 T (T --> numero medio di accessi, con T > 1)");
         }
     }
 }

@@ -5,24 +5,18 @@
  * Matricola: 1032059
  * 
  * Riflessione:
+ * L'implementazione prevede la costruzione di cammini minimi rispetto ad una sorgente multipla, ossia per una qualunque coppia di 
+ * nodi (u, v) appartenente all'insieme di nodi V. L'algoritmo adottato si basa sulla condizione di ottimalita' di Bellman, oltre
+ * alla tecnica del rilassamento, ottenendo una sequenza di nodi le cui funzioni di costo associate agli archi attraversati, abbiano
+ * il peso minimo.
  * 
- * 
- * 1 - lettura del file 
- * 2 - 
- * L'implementazione prevede l'uso di differenti strutture dati combinate fra loro, pur di ottenere i cammini minimi rispetto 
- * all'algoritmo di Bellman-Ford.
- * 
- * E' inizializzata una mappa, contenente come coppia chiave-valore, rispettivamente, il nominativo del nodo e un suo corrispettivo
- * indice intero. Questo e' dovuto essenzialmente affinche' sia possibile costruire i diversi edge in maniera molto 
- * piu' rapida e semplice, attraverso una partenza (src) e una destinazione (dst) descritte attraverso un valore intero.
- * L'inserimento all'interno della Map ha un costo computazionale pari a O(1), mentre, ugualmente, la ricerca dei nodi per la realizzazione degli archi
- * possiede un valore costante a O(1), poiche' ogni qual volta e' specificata la chiave di riferimento del nodo.
- * 
- * L'algoritmo richiesto per individuare i cammini minimi, ossia Bellman-Ford, prevede un costo computazionale dovuto a tale moltiplicazione:
- * (numero archi * numero nodi), piu' brevemente (n * edges.size()), per cui un costo relativo all'ordine di O(2n).
- * 
- * Stabilito l'ordine dell'algoritmo implementato, le funzioni che permettono la stampa tabellare dei differenti cammini minimi dovrebbero essere
- * influenti rispetto al costo computazionale descritto precedentemente.
+ * Come da codice, la prima operazione effettuata prevede la lettura del grafo G = (V, E) non orientato, mediante l'ausilio di una mappa 
+ * capace di memorizzare coppie (chiave, valore), dove la key e' un valore intero mentre il value di tipo stringa, rappresentandone l'id del nodo.
+ * Per la costruzione della soluzione ottima e' implementato l'algoritmo Bellman-Ford, il quale dopo (n - 1) passi di rilassamento sulla totalita'
+ * degli archi, garantisce la costruzione del cammino minimo. Il costo computazionale risulta O(n * m), data la presenza di una concatenazione 
+ * di cicli, dove rispettivamente il primo prevede la scansione sul numero di nodi mentre il secondo permette la visita di tutti gli archi del grafo.
+ * Tuttavia la richiesta prevede soluzioni rispetto a sorgenti multiple per cui l'algoritmo e' ripetuto (n) volte, per una complessita' pari a O(n^3), ossia:
+ * - O(n^3) --> n * O(n * m).
  * 
  * Nota: 
  * Il file dato a riga di comando ha la medesima impostazione fornita dalla traccia dell'esame.
@@ -38,17 +32,16 @@ public class Esercizio4 {
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("Usage: java Esercizio4 Esercizio4.txt");
+        } else {
+            AbileneGraph example = new AbileneGraph(args[0]);
+
+            for (int i = 0; i < example.n; i++) {
+                if (!example.shortestPaths(i))
+                    example.print_paths();
+                else
+                    System.out.println("Attenzione presenza di archi con peso negativo!");
+            }
         }
-
-        AbileneGraph example = new AbileneGraph(args[0]);
-
-        for (int i = 0; i < example.n; i++) {
-            if (!example.shortestPaths(i))
-                example.print_paths();
-            else
-                System.out.println("Attenzione presenza di archi con peso negativo!");
-        }
-
     }
 }
 
@@ -228,10 +221,10 @@ class AbileneGraph {
      */
     public void print_paths() {
         System.out.println();
-        System.out.println("   s    d         dist                path");
+        System.out.println("s       d         dist                path");
         System.out.println("---- ---- ------------ -------------------");
         for (int dst = 0; dst < n; dst++) {
-            System.out.printf("%4d %4d %12.4f ", source, dst, D[dst]);
+            System.out.print(source + "\t" + dst + "\t  " + D[dst] + "\t");
             print_path(dst);
             System.out.println();
         }

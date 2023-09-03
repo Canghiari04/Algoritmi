@@ -43,6 +43,7 @@ class Promotion {
     int n;
     int i = 0;
     double k;
+
     double[] I;
 
     public Promotion(String nameFile) {
@@ -91,6 +92,7 @@ class Promotion {
             scanFile.close();
         } catch (Exception e) {
             System.out.println("Attenzione lettura errata del file di input!");
+            System.exit(0);
         }
     }
 

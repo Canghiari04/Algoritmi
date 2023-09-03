@@ -174,6 +174,7 @@ class SocietyIcarus {
             scanFile.close();
         } catch (Exception e) {
             System.out.println("Compilazione errata del file!");
+            System.exit(0);
         }
     }
 
@@ -196,6 +197,7 @@ class SocietyIcarus {
             scanFile.close();
         } catch (Exception e) {
             System.out.println("Attenzione errore nelle lettura del file!");
+            System.exit(0);
         }
 
         return sizeFile;
