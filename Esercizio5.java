@@ -5,30 +5,35 @@
  * Matricola: 1032059
  * 
  * Considerazioni:
- * L'implementazione richiede la valorizzazione di cammini minimi dato un nodo sorgente, tramite il paradigma della programmazione dinamica.
- * Per cui rispetto alla richiesta occorre implementare l'algoritmo di Floyd-Warshall.
+ * L'implementazione prevede l'uso dell'algoritmo di Floyd-Warshall, affinche' sia possibile costruire una sequenza di nodi il cui costo sia minimo rispettto agli 
+ * archi attraversati, rispetto ad una soluzione posta per una sorgente multipla. Infatti spesso, per la risoluzione di cammini minimi per sorgente multipla, spesso
+ * e' consigliato adoperare l'algoritmo di Floyd-Warshall invece della soluzione proposta da Bellman-Ford, poiche', contrariamente al secondo citato, non avviene 
+ * la stessa ripetizione, per (n) volte, dell'algoritmo per la costruzione di cammini minimi rispetto ad ogni coppia di nodi (u, v) qualsiasi.
+ * 
+ * RIPRENDERE DA QUI
+ * A livello di costo computazionale Floyd-Warshall corrisponde ad un limite asintotico superiore pari a O(n^3) poiche' richiede una concatenazione di tre cicli;
+ * quello posto piu' esternamente per incrementare il valore di (k) vincolo, mentre i due interni sono utilizzati per scansionare la coppia di nodi (u, v)
  * 
  * Nota: 
- * Il file dato a riga di comando ha la medesima impostazione fornita da traccia di esame.
- * 
- * OCCORRE PRIMA STUDIARE LA SEZIONE SUI GRAFI!
+ * Il file dato a riga di comando ha la medesima impostazione fornita dalla traccia dell'esame.
  */
 
-import java.io.*;
-import java.util.*;
+import java.util.Locale;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Scanner;
+import java.io.File;
 
 public class Esercizio5 {
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
-
         if (args.length != 1) {
             System.out.println("Usage: java Esercizio5 Esercizio4.txt");
+        } else {
+            AbileneGraphDynamicProgram example = new AbileneGraphDynamicProgram(args[0]);
+            example.shortestPaths();
+            example.print_paths();
         }
-
-        AbileneGraphDynamicProgram example = new AbileneGraphDynamicProgram(args[0]);
-
-        example.shortestPaths();
-        example.print_paths();
     }
 }
 
@@ -50,7 +55,7 @@ class AbileneGraphDynamicProgram {
      * di ogni edge.
      */
     private double maxCapacity = 0;
-    private Map<String, Integer> nodes = new HashMap<String, Integer>();
+    private HashMap<String, Integer> nodes = new HashMap<String, Integer>();
     private LinkedList<Edge> edges = new LinkedList<Edge>();
 
     public AbileneGraphDynamicProgram(String nameFile) {
@@ -116,12 +121,12 @@ class AbileneGraphDynamicProgram {
                     break;
                 }
             }
-
             for (Edge e : edges) {
                 e.setWeight(maxCapacity);
             }
-        } catch (FileNotFoundException e) {
-            e.getMessage();
+        } catch (Exception e) {
+            System.out.println("Attenzione lettura errata del file di input!");
+            System.exit(0);
         }
     }
 
@@ -181,7 +186,6 @@ class AbileneGraphDynamicProgram {
                 break;
             }
         }
-
     }
 
     /*
@@ -215,7 +219,6 @@ class AbileneGraphDynamicProgram {
                 System.out.print("->" + u);
             }
         }
-
     }
 
     class Edge {
