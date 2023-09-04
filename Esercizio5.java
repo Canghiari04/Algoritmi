@@ -4,15 +4,17 @@
  * Email: matteo.canghiari@studio.unibo.it
  * Matricola: 1032059
  * 
- * Considerazioni:
- * L'implementazione prevede l'uso dell'algoritmo di Floyd-Warshall, affinche' sia possibile costruire una sequenza di nodi il cui costo sia minimo rispettto agli 
- * archi attraversati, rispetto ad una soluzione posta per una sorgente multipla. Infatti spesso, per la risoluzione di cammini minimi per sorgente multipla, spesso
+ * Riflessione:
+ * L'implementazione prevede l'uso dell'algoritmo di Floyd-Warshall, affinche' sia possibile costruire una sequenza di nodi il cui costo sia minimo rispetto agli 
+ * archi attraversati, ottenendo una soluzione posta per una sorgente multipla. Infatti, per la risoluzione di cammini minimi a sorgente multipla, spesso
  * e' consigliato adoperare l'algoritmo di Floyd-Warshall invece della soluzione proposta da Bellman-Ford, poiche', contrariamente al secondo citato, non avviene 
  * la stessa ripetizione, per (n) volte, dell'algoritmo per la costruzione di cammini minimi rispetto ad ogni coppia di nodi (u, v) qualsiasi.
  * 
- * RIPRENDERE DA QUI
- * A livello di costo computazionale Floyd-Warshall corrisponde ad un limite asintotico superiore pari a O(n^3) poiche' richiede una concatenazione di tre cicli;
- * quello posto piu' esternamente per incrementare il valore di (k) vincolo, mentre i due interni sono utilizzati per scansionare la coppia di nodi (u, v)
+ * L'idea pone la propria centralita' attraverso l'uso di una matrice di distanze D(u, v) e una matrice dei padri T(u, v), i quali riferimenti verranno modificati ogni
+ * volta individuato un cammino tra i nodi (u, v) qualsiasi di costo minore rispetto al precedente. Anche in questo e' utilizzata la condizione di Bellman, per stabilire
+ * se la soluzione ammissibile risulti ottima, attuando passi di rilassamento connessi all'incremento del vincolo (k) per la costruzione della sequenza di nodi.
+ * A livello di costo computazionale Floyd-Warshall corrisponde ad un limite asintotico superiore pari a O(n^3) poiche' richiede una concatenazione di tre cicli:
+ * quello posto piu' esternamente per incrementare il valore di (k) vincolo, mentre i due interni sono utilizzati per scansionare la coppia di nodi (u, v).
  * 
  * Nota: 
  * Il file dato a riga di comando ha la medesima impostazione fornita dalla traccia dell'esame.
@@ -39,22 +41,26 @@ public class Esercizio5 {
 
 class AbileneGraphDynamicProgram {
     /*
-     * Variabile intera n per stabilire quali siano la totalita' dei nodi del grafo.
+     * Variabile n che indica il numero di nodi del grafo.
      */
     int n;
 
     /*
-     * Variabile intera m per numero di archi.
+     * Variabile intera maxCapacity attuata affinche' possa essere stabilito il peso
+     * di ogni edge.
+     */
+    private double maxCapacity = 0;
+
+    /*
+     * Variabili utilizzate come di seguito:
+     * m --> numero di archi del grafo;
+     * next --> matrice dei padri;
+     * d --> matrice delle distanze.
      */
     int m;
     int[][] next;
     double[][] d;
 
-    /*
-     * Varibiale intera maxCapacity attuata affinche' possa essere stabilito il peso
-     * di ogni edge.
-     */
-    private double maxCapacity = 0;
     private HashMap<String, Integer> nodes = new HashMap<String, Integer>();
     private LinkedList<Edge> edges = new LinkedList<Edge>();
 
@@ -130,41 +136,45 @@ class AbileneGraphDynamicProgram {
         }
     }
 
-    /*
-     * Costruzione del cammino minimo di ogni nodo appartenete al grafo, mediante
-     * Floy-Warshall.
-     */
     public void shortestPaths() {
         int u, v, k;
         d = new double[n][n];
         next = new int[n][n];
 
         /*
-         * Inizializzata la matrica di distanza.
+         * Fase di inizializzazione della matrice di adiacenza per ogni nodo (u)
+         * appartenente al grafo.
          */
         for (u = 0; u < n; u++) {
             for (v = 0; v < n; v++) {
-                d[u][v] = (u == v ? 0 : Double.POSITIVE_INFINITY);
-                next[u][v] = (u == v ? u : -1);
+                if (u == v) {
+                    d[u][v] = 0;
+                    next[u][v] = u;
+                } else {
+                    d[u][v] = Double.POSITIVE_INFINITY;
+                    next[u][v] = -1;
+                }
             }
         }
 
-        for (final Edge edge : edges) {
-            final double w = edge.getWeigth();
+        /*
+         * Popolamento della matrice contenente la distanza posta tra nodo u e nodo v,
+         * senza passare per nodi intermedi.
+         */
+        for (Edge edge : edges) {
+            double w = edge.w;
             u = edge.src;
             v = edge.dst;
-
-            /*
-             * Riempimento della matrice contenente la distanza posta tra nodo u e nodo v,
-             * senza passare per nodi intermedi.
-             */
             d[u][v] = w;
             next[u][v] = v;
         }
 
         /*
-         * Ciclo essenziale su cui basa la costruzione del cammino minimo rispetto al
-         * paradigma richiesto.
+         * Eseguiti incrementi di k vincolo fino a grandezza massima dei nodi. Ponendo
+         * la possibilita' di attraversare un numero crescente di nodi intermedi,
+         * affinche' tramite la condizione di Bellman, sia garantita la modifica qualora
+         * la nuova sequenza di nodi abbia un costo minore rispetto al cammino costruito
+         * precedentemente.
          */
         for (k = 0; k < n; k++) {
             for (u = 0; u < n; u++) {
@@ -182,15 +192,14 @@ class AbileneGraphDynamicProgram {
          */
         for (u = 0; u < n; u++) {
             if (d[u][u] < 0.0) {
-                System.out.println("Attenzione presenza di archi con peso negativo!");
+                System.out.println("Attenzione presenza di ciclo con peso negativo!");
                 break;
             }
         }
     }
 
     /*
-     * Stampa di tutti i cammini minimi rispetto alla costruzione del metodo
-     * precedente shortestPaths() in cui e' dato un nodo source.
+     * Stampa di tutti i cammini minimi rispetto ad una sorgente multipla.
      */
     public void print_paths() {
         int i, j;
@@ -222,10 +231,10 @@ class AbileneGraphDynamicProgram {
     }
 
     class Edge {
-        final int src;
-        final int dst;
-        private double capacity;
-        private double w;
+        int src;
+        int dst;
+        double capacity;
+        double w;
 
         public Edge(int src, int dst, double capacity) {
             this.src = src;
@@ -233,15 +242,10 @@ class AbileneGraphDynamicProgram {
             this.capacity = capacity;
         }
 
-        public double getWeigth() {
-            return this.w;
-        }
-
         public void setWeight(double maxCapacity) {
             this.w = (maxCapacity / this.capacity);
         }
 
-        @Override
         public String toString() {
             return this.src + " " + this.dst + " " + this.w;
         }
